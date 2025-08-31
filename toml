@@ -1,0 +1,17 @@
+# netlify.toml
+[build]
+  # If plain static HTML/CSS/JS:
+  base    = "frontend"
+  publish = "frontend"
+  command = ""
+
+  # If Vite/React/Vue (uncomment and delete the 3 lines above):
+  # base    = "frontend"
+  # publish = "frontend/dist"
+  # command = "npm ci && npm run build"
+
+# If your frontend uses client-side routing, keep this:
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
