@@ -1,0 +1,65 @@
+{
+  "equivalence": {
+    "adult_extra": 0.5,
+    "kid": 0.3
+  },
+  "exponents": {
+    "housing": 0.35,
+    "transportation": 0.5,
+    "food": 0.85,
+    "insurance_pensions": 0.4,
+    "healthcare": 0.6,
+    "entertainment": 0.6,
+    "cash_contributions": 0.5,
+    "apparel": 0.75,
+    "education": 0.8,
+    "miscellaneous": 0.6,
+    "savings": 0.3
+  },
+  "categories": {
+    "housing": {
+      "base_adult": 180,
+      "base_kid": 70
+    },
+    "transportation": {
+      "base_adult": 140,
+      "base_kid": 50
+    },
+    "food": {
+      "base_adult": 240,
+      "base_kid": 160
+    },
+    "insurance_pensions": {
+      "base_adult": 60,
+      "base_kid": 0
+    },
+    "healthcare": {
+      "base_adult": 110,
+      "base_kid": 90
+    },
+    "entertainment": {
+      "base_adult": 20,
+      "base_kid": 15
+    },
+    "cash_contributions": {
+      "base_adult": 10,
+      "base_kid": 5
+    },
+    "apparel": {
+      "base_adult": 30,
+      "base_kid": 30
+    },
+    "education": {
+      "base_adult": 0,
+      "base_kid": 70
+    },
+    "miscellaneous": {
+      "base_adult": 50,
+      "base_kid": 30
+    },
+    "savings": {
+      "base_adult": 0,
+      "base_kid": 0
+    }
+  }
+}
