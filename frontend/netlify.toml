@@ -1,0 +1,19 @@
+# Netlify config for monorepo: frontend + backend (backend deployed on Render)
+[build]
+  # Your frontend lives in /frontend. If your repo root IS the frontend, set base="" and publish="."
+  base = ""
+  publish = "."
+  command = ""
+
+# If you later move this into a /frontend folder, use:
+# [build]
+#   base = "frontend"
+#   publish = "frontend"
+#   command = ""
+
+# Example dev proxy (optional) to hit a local backend without CORS:
+# [[redirects]]
+#   from = "/api/*"
+#   to = "http://localhost:8000/:splat"
+#   status = 200
+#   force = true
