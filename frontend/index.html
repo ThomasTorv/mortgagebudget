@@ -1,180 +1,393 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Budget & Mortgage Affordability</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Budget & Mortgage Affordability</title>
 
-  <!-- Backend API base (Render) -->
-  <script>
-    // You can also inject this via Netlify env if you prefer.
-    window.API_URL = "https://mortgagebudget.onrender.com";
-  </script>
+    <!-- Backend API base (Render) -->
+    <script>
+      // You can also inject this via Netlify env if you prefer.
+      window.API_URL = "https://mortgagebudget.onrender.com";
+    </script>
 
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="app.js"></script>
-</head>
-<body class="bg-gray-50 text-gray-900">
-  <div class="max-w-6xl mx-auto p-6 space-y-6">
-    <header>
-      <h1 class="text-2xl md:text-3xl font-bold">Budget &amp; Mortgage Affordability</h1>
-      <p class="text-sm text-gray-600 mt-1">Hover the ℹ️ icons for help. Toggle <strong>gross</strong>/<strong>net</strong> for DTI. Household size adjusts the survival budget.</p>
-    </header>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="app.js"></script>
+  </head>
+  <body class="bg-gray-50 text-gray-900">
+    <div class="max-w-6xl mx-auto p-6 space-y-6">
+      <header>
+        <h1 class="text-2xl md:text-3xl font-bold">
+          Budget &amp; Mortgage Affordability!!!
+        </h1>
+        <p class="text-sm text-gray-600 mt-1">
+          Hover the ℹ️ icons for help. Toggle <strong>gross</strong>/<strong
+            >net</strong
+          >
+          for DTI. Household size adjusts the survival budget.
+        </p>
+      </header>
 
-    <section class="bg-white rounded-lg shadow p-4">
-      <h2 class="font-semibold mb-2">DTI Presets</h2>
-      <div class="flex flex-wrap gap-2">
-        <button data-preset="conventional" class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200">Conventional (28/36)</button>
-        <button data-preset="fha" class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200">FHA (31/43)</button>
-        <button data-preset="va" class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200">VA (~0/41)</button>
-        <button data-preset="custom" class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200">Custom</button>
-      </div>
-      <p class="text-xs text-gray-600 mt-2">Front-end DTI = PITI ÷ income. Back-end DTI = (PITI + other debts) ÷ income.</p>
-    </section>
+      <section class="bg-white rounded-lg shadow p-4">
+        <h2 class="font-semibold mb-2">DTI Presets</h2>
+        <div class="flex flex-wrap gap-2">
+          <button
+            data-preset="conventional"
+            class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200"
+          >
+            Conventional (28/36)
+          </button>
+          <button
+            data-preset="fha"
+            class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200"
+          >
+            FHA (31/43)
+          </button>
+          <button
+            data-preset="va"
+            class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200"
+          >
+            VA (~0/41)
+          </button>
+          <button
+            data-preset="custom"
+            class="preset-btn px-3 py-2 rounded bg-slate-100 hover:bg-slate-200"
+          >
+            Custom
+          </button>
+        </div>
+        <p class="text-xs text-gray-600 mt-2">
+          Front-end DTI = PITI ÷ income. Back-end DTI = (PITI + other debts) ÷
+          income.
+        </p>
+      </section>
 
-    <form id="calcForm" class="bg-white rounded-lg shadow p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Annual Gross Income (USD)
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Pre-tax yearly income; for joint apps, combine incomes.</span></span>
-          </span>
-        </label>
-        <input id="annual_income" type="number" inputmode="decimal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="120000" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Filing Status
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Drives federal/state brackets and standard deduction.</span></span>
-          </span>
-        </label>
-        <select id="filing_status" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-          <option value="single">Single</option>
-          <option value="married_joint">Married filing jointly</option>
-          <option value="head_of_household">Head of household</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Adults in household
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">All adults (18+). Used to scale shared/per-person survival costs.</span></span>
-          </span>
-        </label>
-        <input id="adults" type="number" min="1" max="10" value="1" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Kids in household
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Dependents under 18. Increases food/education/etc.</span></span>
-          </span>
-        </label>
-        <input id="kids" type="number" min="0" max="10" value="0" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">State
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Determines state tax rules (flat/progressive/none).</span></span>
-          </span>
-        </label>
-        <select id="state_code" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
-          <option value="">Use flat rate</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">State Tax (flat, e.g., 0.05 = 5%)
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Editable only when “Use flat rate” is selected. Flat/no-tax states lock this field.</span></span>
-          </span>
-        </label>
-        <input id="state_rate" type="number" step="0.0001" inputmode="decimal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="0.00" />
-      </div>
-
-      <div class="md:col-span-2 flex items-center gap-2 border rounded p-3 bg-slate-50">
-        <input id="use_net_dti" type="checkbox" class="h-4 w-4">
-        <div class="text-sm">Use <strong>net (after-tax)</strong> income for DTI limits. If off, DTI uses <strong>gross</strong> income.</div>
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Other Monthly Debt (USD)
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Car/student loans, credit card minimums, child support/alimony, personal loans.</span></span>
-          </span>
-        </label>
-        <input id="other_debt" type="number" inputmode="decimal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="0" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Mortgage Rate (annual, e.g., 0.066)
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Annual nominal interest rate.</span></span>
-          </span>
-        </label>
-        <input id="rate_annual" type="number" step="0.0001" inputmode="decimal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="0.066" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Term (years)
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Common terms: 15 or 30 years.</span></span>
-          </span>
-        </label>
-        <input id="term_years" type="number" inputmode="numeric" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="30" />
-      </div>
-
-      <div>
-        <label class="block text-sm font-medium mb-1">
-          <span class="inline-flex items-center gap-1">Taxes &amp; Insurance (monthly)
-            <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">Estimated monthly property tax + homeowner’s insurance.</span></span>
-          </span>
-        </label>
-        <input id="ti_monthly" type="number" inputmode="decimal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="400" />
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 md:col-span-2">
+      <form
+        id="calcForm"
+        class="bg-white rounded-lg shadow p-4 grid grid-cols-1 md:grid-cols-2 gap-4"
+      >
         <div>
           <label class="block text-sm font-medium mb-1">
-            <span class="inline-flex items-center gap-1">Front-end DTI
-              <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">PITI ÷ monthly income.</span></span>
+            <span class="inline-flex items-center gap-1"
+              >Annual Gross Income (USD)
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Pre-tax yearly income; for joint apps, combine incomes.</span
+                ></span
+              >
             </span>
           </label>
-          <input id="front_end" type="number" step="0.01" inputmode="decimal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="0.28" />
+          <input
+            id="annual_income"
+            type="number"
+            inputmode="decimal"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            value="120000"
+          />
         </div>
+
         <div>
           <label class="block text-sm font-medium mb-1">
-            <span class="inline-flex items-center gap-1">Back-end DTI
-              <span class="relative inline-flex items-center group"><span class="ml-1 cursor-pointer text-blue-600 select-none">ℹ️</span><span class="tooltip">(PITI + other debts) ÷ monthly income.</span></span>
+            <span class="inline-flex items-center gap-1"
+              >Filing Status
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Drives federal/state brackets and standard deduction.</span
+                ></span
+              >
             </span>
           </label>
-          <input id="back_end" type="number" step="0.01" inputmode="decimal" class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300" value="0.36" />
+          <select
+            id="filing_status"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+          >
+            <option value="single">Single</option>
+            <option value="married_joint">Married filing jointly</option>
+            <option value="head_of_household">Head of household</option>
+          </select>
         </div>
-      </div>
 
-      <div class="md:col-span-2">
-        <button class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700">Calculate</button>
-      </div>
-    </form>
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >Adults in household
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >All adults (18+). Used to scale shared/per-person survival
+                  costs.</span
+                ></span
+              >
+            </span>
+          </label>
+          <input
+            id="adults"
+            type="number"
+            min="1"
+            max="10"
+            value="1"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
 
-    <section id="results" class="space-y-4"></section>
-  </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >Kids in household
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Dependents under 18. Increases food/education/etc.</span
+                ></span
+              >
+            </span>
+          </label>
+          <input
+            id="kids"
+            type="number"
+            min="0"
+            max="10"
+            value="0"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+          />
+        </div>
 
-  <!-- Modal: Tax Breakdown -->
-  <div id="taxModal" class="fixed inset-0 hidden items-center justify-center z-50">
-    <div class="absolute inset-0 bg-black/50"></div>
-    <div class="relative bg-white w-11/12 max-w-2xl rounded shadow-lg p-4">
-      <div class="flex items-center justify-between mb-2">
-        <h3 class="text-lg font-semibold">State Tax Bracket Calculation</h3>
-        <button id="taxModalClose" class="text-gray-500 hover:text-gray-700">&times;</button>
-      </div>
-      <div id="taxModalBody" class="text-sm overflow-y-auto" style="max-height:60vh;"></div>
-      <div class="mt-3 text-right">
-        <button id="taxModalOk" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Close</button>
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >State
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Determines state tax rules (flat/progressive/none).</span
+                ></span
+              >
+            </span>
+          </label>
+          <select
+            id="state_code"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+          >
+            <option value="">Use flat rate</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >State Tax (flat, e.g., 0.05 = 5%)
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Editable only when “Use flat rate” is selected. Flat/no-tax
+                  states lock this field.</span
+                ></span
+              >
+            </span>
+          </label>
+          <input
+            id="state_rate"
+            type="number"
+            step="0.0001"
+            inputmode="decimal"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            value="0.00"
+          />
+        </div>
+
+        <div
+          class="md:col-span-2 flex items-center gap-2 border rounded p-3 bg-slate-50"
+        >
+          <input id="use_net_dti" type="checkbox" class="h-4 w-4" />
+          <div class="text-sm">
+            Use <strong>net (after-tax)</strong> income for DTI limits. If off,
+            DTI uses <strong>gross</strong> income.
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >Other Monthly Debt (USD)
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Car/student loans, credit card minimums, child
+                  support/alimony, personal loans.</span
+                ></span
+              >
+            </span>
+          </label>
+          <input
+            id="other_debt"
+            type="number"
+            inputmode="decimal"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            value="0"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >Mortgage Rate (annual, e.g., 0.066)
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Annual nominal interest rate.</span
+                ></span
+              >
+            </span>
+          </label>
+          <input
+            id="rate_annual"
+            type="number"
+            step="0.0001"
+            inputmode="decimal"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            value="0.066"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >Term (years)
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Common terms: 15 or 30 years.</span
+                ></span
+              >
+            </span>
+          </label>
+          <input
+            id="term_years"
+            type="number"
+            inputmode="numeric"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            value="30"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium mb-1">
+            <span class="inline-flex items-center gap-1"
+              >Taxes &amp; Insurance (monthly)
+              <span class="relative inline-flex items-center group"
+                ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                  >ℹ️</span
+                ><span class="tooltip"
+                  >Estimated monthly property tax + homeowner’s insurance.</span
+                ></span
+              >
+            </span>
+          </label>
+          <input
+            id="ti_monthly"
+            type="number"
+            inputmode="decimal"
+            class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+            value="400"
+          />
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 md:col-span-2">
+          <div>
+            <label class="block text-sm font-medium mb-1">
+              <span class="inline-flex items-center gap-1"
+                >Front-end DTI
+                <span class="relative inline-flex items-center group"
+                  ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                    >ℹ️</span
+                  ><span class="tooltip">PITI ÷ monthly income.</span></span
+                >
+              </span>
+            </label>
+            <input
+              id="front_end"
+              type="number"
+              step="0.01"
+              inputmode="decimal"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+              value="0.28"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">
+              <span class="inline-flex items-center gap-1"
+                >Back-end DTI
+                <span class="relative inline-flex items-center group"
+                  ><span class="ml-1 cursor-pointer text-blue-600 select-none"
+                    >ℹ️</span
+                  ><span class="tooltip"
+                    >(PITI + other debts) ÷ monthly income.</span
+                  ></span
+                >
+              </span>
+            </label>
+            <input
+              id="back_end"
+              type="number"
+              step="0.01"
+              inputmode="decimal"
+              class="w-full border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+              value="0.36"
+            />
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <button
+            class="w-full bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700"
+          >
+            Calculate
+          </button>
+        </div>
+      </form>
+
+      <section id="results" class="space-y-4"></section>
+    </div>
+
+    <!-- Modal: Tax Breakdown -->
+    <div
+      id="taxModal"
+      class="fixed inset-0 hidden items-center justify-center z-50"
+    >
+      <div class="absolute inset-0 bg-black/50"></div>
+      <div class="relative bg-white w-11/12 max-w-2xl rounded shadow-lg p-4">
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="text-lg font-semibold">State Tax Bracket Calculation</h3>
+          <button id="taxModalClose" class="text-gray-500 hover:text-gray-700">
+            &times;
+          </button>
+        </div>
+        <div
+          id="taxModalBody"
+          class="text-sm overflow-y-auto"
+          style="max-height: 60vh"
+        ></div>
+        <div class="mt-3 text-right">
+          <button
+            id="taxModalOk"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Close
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>
